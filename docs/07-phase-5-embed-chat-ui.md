@@ -20,9 +20,10 @@ Up to now, everything has been testable with `curl` and a Node script. This phas
 
 ### 1. Read `botId` and get the bot's branding
 
-`/embed?botId=acme-coffee` needs the bot's `name` and `accentColor` to theme itself (header color, bubble accent) before it can render anything meaningful. Two ways to get this, pick the cleaner one:
-- **A small `GET /api/bot-meta?botId=...` endpoint** that returns just `{ name, accentColor }` (not the full knowledge blob — no reason to ship that to the browser) — this is the cleaner option and is what's assumed in the folder structure ([01-architecture-overview.md](01-architecture-overview.md)).
-- Or, thread the values through the query string directly from `widget.js` in Phase 6 — simpler, but couples the loader script to knowing branding details up front and makes rebranding (Phase 7) require touching the loader instead of just the bot's JSON file. The `bot-meta` endpoint keeps Phase 7's "add one JSON file, zero code changes" claim clean.
+`/embed?botId=acme-coffee` needs the bot's `name` and `accentColor` to theme itself (header color, bubble accent) before it can render anything meaningful. Two ways to get this:
+- **A small `GET /api/bot-meta?botId=...` endpoint** that returns just `{ name, accentColor }` (not the full knowledge blob).
+- **What we actually built:** since `app/embed/page.tsx` is a Next.js Server Component, it can call `getBot(botId)` directly on the server and pass just `{ name, accentColor }` down as props to the client `ChatWindow` — no extra API route needed at all. This is simpler than the `bot-meta` endpoint above (one fewer network round trip, one fewer file to maintain) while giving the identical guarantee: the browser only ever sees `name`/`accentColor`, never the full `knowledge` string, since that never leaves the server.
+- Threading the values through the query string directly from `widget.js` in Phase 6 remains the one option to avoid — it couples the loader script to branding details and would make rebranding (Phase 7) require touching the loader instead of just the bot's JSON file.
 
 ### 2. Build `ChatWindow`
 
@@ -67,7 +68,7 @@ Design and test at roughly **380px wide × 560px tall** (a typical chat-widget i
 
 - **Consuming a streamed fetch response in the browser.** The `ChatWindow` needs to read `response.body` as a stream (e.g. via `getReader()` on a `ReadableStream`, or `EventSource`/manual SSE parsing if Phase 4 chose SSE) and update UI state as each chunk arrives — this is genuinely different from a normal `await response.json()` flow and is worth understanding rather than copy-pasting.
 - **Designing for a fixed, small viewport as the primary target.** Most web UI work assumes "responsive, but desktop-first." This component's *actual* primary viewport is a ~380×560 box — designing there first and expanding to mobile-full-screen second (rather than the usual desktop-first-then-cram-into-mobile approach) produces a better result here.
-- **Not shipping more data than the client needs.** `bot-meta` returning only `{ name, accentColor }` — never the full `knowledge` blob — to the browser is a small but real security/privacy habit: the business's internal facts should only ever be used server-side to construct the model prompt, not handed to any client that asks.
+- **Not shipping more data than the client needs.** Whether via a `bot-meta` endpoint or (as built here) a Server Component doing the `getBot()` lookup itself, only `{ name, accentColor }` ever reaches the browser — never the full `knowledge` blob. The business's internal facts should only ever be used server-side to construct the model prompt, not handed to any client that asks.
 
 ---
 

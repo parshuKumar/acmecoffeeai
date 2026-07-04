@@ -114,8 +114,7 @@ ai-chatbot-widget/
 │   ├── layout.tsx
 │   ├── globals.css
 │   └── api/
-│       ├── chat/route.ts        # botId + question → knowledge lookup → streamed answer (CORS enabled)
-│       └── bot-meta/route.ts    # small public endpoint: botId → {name, accentColor} for theming /embed
+│       └── chat/route.ts        # botId + question → knowledge lookup → streamed answer (CORS enabled)
 ├── public/
 │   └── widget.js                # the loader script clients paste (bubble + iframe injector)
 ├── bots/
