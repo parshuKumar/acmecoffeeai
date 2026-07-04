@@ -7,7 +7,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import MessageBubble, { type MessageRole } from "./MessageBubble";
-import { MAX_MESSAGE_LENGTH } from "@/lib/config";
+import { MAX_MESSAGE_LENGTH, SHOW_POWERED_BY } from "@/lib/config";
 
 type Message = { role: MessageRole; content: string };
 type Status = "idle" | "thinking" | "streaming";
@@ -127,6 +127,10 @@ export default function ChatWindow({
           Send
         </button>
       </form>
+
+      {SHOW_POWERED_BY && (
+        <p className="pb-2 text-center text-[11px] text-espresso/40">Powered by [Your Name]</p>
+      )}
     </div>
   );
 }
