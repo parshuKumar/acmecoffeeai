@@ -13,7 +13,17 @@
 import { NextRequest } from "next/server";
 import { getBot, UnknownBotError } from "@/lib/bots";
 import { streamBotAnswer, type ChatMessage } from "@/lib/ai";
-import { MAX_MESSAGE_LENGTH, MAX_HISTORY_MESSAGES } from "@/lib/config";
+import { MAX_MESSAGE_LENGTH, MAX_HISTORY_MESSAGES, RATE_LIMIT_PER_MIN } from "@/lib/config";
+import { isRateLimited } from "@/lib/rateLimit";
+
+const RATE_LIMIT_MESSAGE =
+  "You're sending messages a little fast — give me a moment! Please wait about a minute before trying again.";
+
+function getClientKey(req: NextRequest): string {
+  const forwardedFor = req.headers.get("x-forwarded-for");
+  if (forwardedFor) return forwardedFor.split(",")[0].trim();
+  return req.headers.get("x-real-ip") ?? "unknown";
+}
 
 // Permissive for this demo. A version serving real paying clients would
 // allowlist each client's own domain per botId instead of "*".
@@ -27,6 +37,16 @@ function jsonError(status: number, error: string) {
   return new Response(JSON.stringify({ error }), {
     status,
     headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+  });
+}
+
+// Same shape as a real streamed answer (200, text/plain) so the widget's UI
+// doesn't need any special-case handling for "you're being rate limited" —
+// it just renders as a normal bot message.
+function textResponse(text: string) {
+  return new Response(text, {
+    status: 200,
+    headers: { "Content-Type": "text/plain; charset=utf-8", ...CORS_HEADERS },
   });
 }
 
@@ -71,6 +91,10 @@ export async function POST(req: NextRequest) {
   const trimmedQuestion = question.trim();
   if (trimmedQuestion.length > MAX_MESSAGE_LENGTH) {
     return jsonError(400, `question must be ${MAX_MESSAGE_LENGTH} characters or fewer.`);
+  }
+
+  if (isRateLimited(getClientKey(req), RATE_LIMIT_PER_MIN)) {
+    return textResponse(RATE_LIMIT_MESSAGE);
   }
 
   let safeHistory: ChatMessage[] = [];
