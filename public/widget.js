@@ -9,8 +9,12 @@
 // small floating bubble and toggle that iframe, using only inline styles and
 // an extreme z-index so it can't collide with the host page's CSS.
 //
-// Must be loaded as a plain synchronous <script src="...">, not async/defer —
-// that's what guarantees document.currentScript below refers to this tag.
+// Must be a <script src="..."> tag written directly in the page's HTML (the
+// browser's parser inserts it), not one injected dynamically at runtime via
+// document.createElement()/appendChild() — that's what guarantees
+// document.currentScript below refers to this tag. `async`/`defer` are both
+// fine on a parser-inserted tag like this; currentScript tracking depends on
+// how the tag got into the page, not on those attributes.
 (function () {
   "use strict";
 
@@ -21,7 +25,7 @@
     var scriptEl = document.currentScript;
     if (!scriptEl) {
       console.error(
-        "[chat-widget] document.currentScript is unavailable — make sure the widget <script> tag is a plain synchronous tag (no async/defer). Skipping."
+        "[chat-widget] document.currentScript is unavailable — make sure the widget <script> tag is written directly in the page's HTML, not injected dynamically via JS. Skipping."
       );
       return;
     }

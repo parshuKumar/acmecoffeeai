@@ -203,10 +203,16 @@ export default function Home() {
       {/*
         The real embed snippet a client would paste onto their site — a plain
         <script> tag (not next/script), on purpose: widget.js relies on
-        document.currentScript, which is only reliable for a normal,
-        synchronously parsed <script src> tag like this one.
+        document.currentScript to find its own data-bot-id and origin, which
+        only works for a script tag the HTML parser inserted directly (as
+        this one is) — not one a framework injects dynamically at runtime,
+        which is what next/script's loading strategies do.
+        `defer` is fine here (and satisfies Next's no-sync-scripts lint rule):
+        currentScript tracking depends on being parser-inserted, not on the
+        async/defer attributes, and `defer` is also the better real-world
+        default for a client's site since it never blocks their page render.
       */}
-      <script src="/widget.js" data-bot-id="acme-coffee" />
+      <script src="/widget.js" data-bot-id="acme-coffee" defer />
     </div>
   );
 }
