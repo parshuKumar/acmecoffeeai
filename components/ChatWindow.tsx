@@ -128,9 +128,9 @@ export default function ChatWindow({
         </button>
       </form>
 
-      {SHOW_POWERED_BY && (
+      {/* {SHOW_POWERED_BY && (
         <p className="pb-2 text-center text-[11px] text-espresso/40">Powered by [Your Name]</p>
-      )}
+      )} */}
     </div>
   );
 }
