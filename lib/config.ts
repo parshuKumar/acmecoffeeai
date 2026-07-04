@@ -18,4 +18,4 @@ export const RATE_LIMIT_PER_MIN = 20;
 export const MAX_HISTORY_MESSAGES = 10;
 
 // Product/branding.
-export const SHOW_POWERED_BY = true;
+export const SHOW_POWERED_BY = false;
