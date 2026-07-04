@@ -199,6 +199,14 @@ export default function Home() {
           <p>© {new Date().getFullYear()} Acme Coffee · 214 Maple Street, Riverside</p>
         </div>
       </footer>
+
+      {/*
+        The real embed snippet a client would paste onto their site — a plain
+        <script> tag (not next/script), on purpose: widget.js relies on
+        document.currentScript, which is only reliable for a normal,
+        synchronously parsed <script src> tag like this one.
+      */}
+      <script src="/widget.js" data-bot-id="acme-coffee" />
     </div>
   );
 }
