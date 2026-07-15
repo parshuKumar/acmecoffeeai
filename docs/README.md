@@ -16,6 +16,7 @@ This folder is the detailed, explainable version of the phased build plan for th
 
 | # | Doc | What it covers |
 |---|---|---|
+| — | [project-summary.md](project-summary.md) | **Share this one.** A factual, self-contained project summary — what was built, tested, and found — ready to hand to another AI for a LinkedIn post or to pull resume bullets from |
 | — | [00-model-landscape.md](00-model-landscape.md) | Free vs. paid LLM options in the market today, and why Groq was picked — read this first, it's general knowledge as much as a build decision |
 | — | [01-architecture-overview.md](01-architecture-overview.md) | The full architecture, why an iframe, why each file exists — read this once before Phase 1 |
 | 0 | [02-phase-0-prerequisites.md](02-phase-0-prerequisites.md) | Node, Groq API key, GitHub repo, your demo business's facts |
